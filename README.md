@@ -218,18 +218,6 @@ Trigger an alert if the Docker host storage is almost full:
 
 ***Docker Containers alerts***
 
-Trigger an alert if a container is down for more than 30 seconds:
-
-```yaml
-- alert: jenkins_down
-    expr: absent(container_memory_usage_bytes{name="jenkins"})
-    for: 30s
-    labels:
-      severity: critical
-    annotations:
-      summary: "Jenkins down"
-      description: "Jenkins container is down for more than 30 seconds."
-```
 
 Trigger an alert if a container is using more than 10% of total CPU cores for more than 30 seconds:
 
