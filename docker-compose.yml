@@ -3,11 +3,10 @@ networks:
     driver: bridge
 
 volumes:
-    prometheus_data: {}
-    grafana_data: {}
+  prometheus_data: {}
+  grafana_data: {}
 
 services:
-
   prometheus:
     image: prom/prometheus:v3.1.0
     container_name: prometheus
@@ -15,15 +14,15 @@ services:
       - ./prometheus:/etc/prometheus
       - prometheus_data:/prometheus
     command:
-      - '--config.file=/etc/prometheus/prometheus.yml'
-      - '--storage.tsdb.path=/prometheus'
-      - '--web.console.libraries=/etc/prometheus/console_libraries'
-      - '--web.console.templates=/etc/prometheus/consoles'
-      - '--storage.tsdb.retention.time=200h'
-      - '--web.enable-lifecycle'
-    restart: unless-stopped
+      - "--config.file=/etc/prometheus/prometheus.yml"
+      - "--storage.tsdb.path=/prometheus"
+      - "--web.console.libraries=/etc/prometheus/console_libraries"
+      - "--web.console.templates=/etc/prometheus/consoles"
+      - "--storage.tsdb.retention.time=${PROMETHEUS_RETENTION_TIME}"
+      - "--web.enable-lifecycle"
+    restart: ${RESTART_POLICY}
     expose:
-      - 9090
+      - ${PROMETHEUS_PORT}
     networks:
       - monitor-net
     labels:
@@ -35,11 +34,11 @@ services:
     volumes:
       - ./alertmanager:/etc/alertmanager
     command:
-      - '--config.file=/etc/alertmanager/config.yml'
-      - '--storage.path=/alertmanager'
-    restart: unless-stopped
+      - "--config.file=/etc/alertmanager/config.yml"
+      - "--storage.path=/alertmanager"
+    restart: ${RESTART_POLICY}
     expose:
-      - 9093
+      - ${ALERTMANAGER_PORT}
     networks:
       - monitor-net
     labels:
@@ -53,13 +52,13 @@ services:
       - /sys:/host/sys:ro
       - /:/rootfs:ro
     command:
-      - '--path.procfs=/host/proc'
-      - '--path.rootfs=/rootfs'
-      - '--path.sysfs=/host/sys'
-      - '--collector.filesystem.mount-points-exclude=^/(sys|proc|dev|host|etc)($$|/)'
-    restart: unless-stopped
+      - "--path.procfs=/host/proc"
+      - "--path.rootfs=/rootfs"
+      - "--path.sysfs=/host/sys"
+      - "--collector.filesystem.mount-points-exclude=^/(sys|proc|dev|host|etc)($$|/)"
+    restart: ${RESTART_POLICY}
     expose:
-      - 9100
+      - ${NODEEXPORTER_PORT}
     networks:
       - monitor-net
     labels:
@@ -77,9 +76,9 @@ services:
       - /sys:/sys:ro
       - /var/lib/docker:/var/lib/docker:ro
       #- /cgroup:/cgroup:ro #doesn't work on MacOS only for Linux
-    restart: unless-stopped
+    restart: ${RESTART_POLICY}
     expose:
-      - 8080
+      - ${CADVISOR_PORT}
     networks:
       - monitor-net
     labels:
@@ -93,12 +92,13 @@ services:
       - ./grafana/provisioning/dashboards:/etc/grafana/provisioning/dashboards
       - ./grafana/provisioning/datasources:/etc/grafana/provisioning/datasources
     environment:
-      - GF_SECURITY_ADMIN_USER=${ADMIN_USER:-admin}
-      - GF_SECURITY_ADMIN_PASSWORD=${ADMIN_PASSWORD:-admin}
-      - GF_USERS_ALLOW_SIGN_UP=false
-    restart: unless-stopped
+      - GF_SECURITY_ADMIN_USER=${ADMIN_USER}
+      - GF_SECURITY_ADMIN_PASSWORD=${ADMIN_PASSWORD}
+      - GF_USERS_ALLOW_SIGN_UP=${ALLOW_SIGNUP}
+      - PROMETHEUS_PORT=${PROMETHEUS_PORT}
+    restart: ${RESTART_POLICY}
     expose:
-      - 3000
+      - ${GRAFANA_PORT}
     networks:
       - monitor-net
     labels:
@@ -107,9 +107,9 @@ services:
   pushgateway:
     image: prom/pushgateway:v1.11.0
     container_name: pushgateway
-    restart: unless-stopped
+    restart: ${RESTART_POLICY}
     expose:
-      - 9091
+      - ${PUSHGATEWAY_PORT}
     networks:
       - monitor-net
     labels:
@@ -119,18 +119,28 @@ services:
     image: caddy:2.9.1
     container_name: caddy
     ports:
-      - "3000:3000"
-      - "8080:8080"
-      - "9090:9090"
-      - "9093:9093"
-      - "9091:9091"
+      - "${HOST_GRAFANA_PORT}:${HOST_GRAFANA_PORT}"
+      - "${HOST_CADVISOR_PORT}:${HOST_CADVISOR_PORT}"
+      - "${HOST_PROMETHEUS_PORT}:${HOST_PROMETHEUS_PORT}"
+      - "${HOST_ALERTMANAGER_PORT}:${HOST_ALERTMANAGER_PORT}"
+      - "${HOST_PUSHGATEWAY_PORT}:${HOST_PUSHGATEWAY_PORT}"
     volumes:
       - ./caddy:/etc/caddy
     environment:
-      - ADMIN_USER=${ADMIN_USER:-admin}
-      - ADMIN_PASSWORD=${ADMIN_PASSWORD:-admin}
-      - ADMIN_PASSWORD_HASH=${ADMIN_PASSWORD_HASH:-$2a$14$1l.IozJx7xQRVmlkEQ32OeEEfP5mRxTpbDTCTcXRqn19gXD8YK1pO}
-    restart: unless-stopped
+      - ADMIN_USER=${ADMIN_USER}
+      - ADMIN_PASSWORD=${ADMIN_PASSWORD}
+      - ADMIN_PASSWORD_HASH=${ADMIN_PASSWORD_HASH}
+      - HOST_GRAFANA_PORT=${HOST_GRAFANA_PORT}
+      - GRAFANA_PORT=${GRAFANA_PORT}
+      - HOST_CADVISOR_PORT=${HOST_CADVISOR_PORT}
+      - CADVISOR_PORT=${CADVISOR_PORT}
+      - HOST_PROMETHEUS_PORT=${HOST_PROMETHEUS_PORT}
+      - PROMETHEUS_PORT=${PROMETHEUS_PORT}
+      - HOST_ALERTMANAGER_PORT=${HOST_ALERTMANAGER_PORT}
+      - ALERTMANAGER_PORT=${ALERTMANAGER_PORT}
+      - HOST_PUSHGATEWAY_PORT=${HOST_PUSHGATEWAY_PORT}
+      - PUSHGATEWAY_PORT=${PUSHGATEWAY_PORT}
+    restart: ${RESTART_POLICY}
     networks:
       - monitor-net
     labels:
