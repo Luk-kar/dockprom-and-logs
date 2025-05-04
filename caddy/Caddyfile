@@ -1,31 +1,31 @@
-:3000 {
-    reverse_proxy grafana:3000  
+:{$HOST_GRAFANA_PORT} {
+    reverse_proxy grafana:{$GRAFANA_PORT}
 }
 
-:8080 {
-    basicauth /* {
-        {$ADMIN_USER} {$ADMIN_PASSWORD_HASH}
-    }    
-    reverse_proxy cadvisor:8080
-}
-
-:9090 {
+:{$HOST_CADVISOR_PORT} {
     basicauth /* {
         {$ADMIN_USER} {$ADMIN_PASSWORD_HASH}
     }
-    reverse_proxy prometheus:9090
+    reverse_proxy cadvisor:{$CADVISOR_PORT}
 }
 
-:9093 {
+:{$HOST_PROMETHEUS_PORT} {
     basicauth /* {
         {$ADMIN_USER} {$ADMIN_PASSWORD_HASH}
     }
-    reverse_proxy alertmanager:9093
+    reverse_proxy prometheus:{$PROMETHEUS_PORT}
 }
 
-:9091 {
+:{$HOST_ALERTMANAGER_PORT} {
     basicauth /* {
         {$ADMIN_USER} {$ADMIN_PASSWORD_HASH}
-    }    
-    reverse_proxy pushgateway:9091
+    }
+    reverse_proxy alertmanager:{$ALERTMANAGER_PORT}
+}
+
+:{$HOST_PUSHGATEWAY_PORT} {
+    basicauth /* {
+        {$ADMIN_USER} {$ADMIN_PASSWORD_HASH}
+    }
+    reverse_proxy pushgateway:{$PUSHGATEWAY_PORT}
 }
