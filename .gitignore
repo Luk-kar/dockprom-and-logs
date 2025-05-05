@@ -2,3 +2,5 @@
 .vs/
 .vscode/
 .idea/
+output.md
+read_files_and_content.sh

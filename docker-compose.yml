@@ -8,23 +8,40 @@ volumes:
 
 services:
   prometheus:
-    image: prom/prometheus:v3.1.0
-    container_name: prometheus
-    volumes:
-      - ./prometheus/config:/etc/prometheus
-      - prometheus_data:/prometheus
-    command:
-      - "--config.file=/etc/prometheus/prometheus.yml"
-      - "--storage.tsdb.path=/prometheus"
-      - "--web.console.libraries=/etc/prometheus/console_libraries"
-      - "--web.console.templates=/etc/prometheus/consoles"
-      - "--storage.tsdb.retention.time=${PROMETHEUS_RETENTION_TIME}"
-      - "--web.enable-lifecycle"
-    restart: ${RESTART_POLICY}
+    build:
+      context: ./prometheus
+      dockerfile: Dockerfile
+      args:
+        - PROMETHEUS_MONITOR_LABEL=${PROMETHEUS_MONITOR_LABEL}
+        - NODEEXPORTER_PORT=${NODEEXPORTER_PORT}
+        - CADVISOR_PORT=${CADVISOR_PORT}
+        - PROMETHEUS_PORT=${PROMETHEUS_PORT}
+        - PUSHGATEWAY_PORT=${PUSHGATEWAY_PORT}
+        - ALERTMANAGER_PORT=${ALERTMANAGER_PORT}
+        - NGIX_EXPORTER_PORT=${NGIX_EXPORTER_PORT}
+        - EVENT_LOG_PORT=${EVENT_LOG_PORT}
+        - PROMETHEUS_RETENTION_TIME=${PROMETHEUS_RETENTION_TIME}
     expose:
       - ${PROMETHEUS_PORT}
+    environment:
+      - PROMETHEUS_RETENTION_TIME=${PROMETHEUS_RETENTION_TIME}
+    volumes:
+      - prometheus_data:/prometheus
     networks:
       - monitor-net
+    restart: ${RESTART_POLICY}
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "wget",
+          "--spider",
+          "-q",
+          "http://localhost:${PROMETHEUS_PORT}/-/ready",
+        ]
+      interval: 30s
+      timeout: 5s
+      retries: 3
     labels:
       org.label-schema.group: "monitoring"
 
