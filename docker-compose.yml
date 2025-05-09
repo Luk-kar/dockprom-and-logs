@@ -45,6 +45,41 @@ services:
     labels:
       org.label-schema.group: "monitoring"
 
+  loki:
+    image: grafana/loki:2.9.3
+    container_name: loki
+    volumes:
+      - ./src/monitoring/loki:/etc/loki
+    command: -config.file=/etc/loki/loki-config.yml -config.expand-env=true
+    environment:
+      - LOKI_HTTP_PORT=${LOKI_PORT}
+      - LOKI_GRPC_PORT=${LOKI_GRPC_PORT}
+      - LOKI_PATH_PREFIX=${LOKI_PATH_PREFIX}
+      - LOKI_REPLICATION_FACTOR=${LOKI_REPLICATION_FACTOR}
+      - LOKI_INDEX_PERIOD=${LOKI_INDEX_PERIOD}
+      - LOKI_ALERTMANAGER_URL=http://alertmanager:${ALERTMANAGER_PORT}
+    restart: ${RESTART_POLICY}
+    expose:
+      - ${LOKI_PORT}
+    networks:
+      - monitor-net
+    labels:
+      org.label-schema.group: "monitoring"
+  promtail:
+    image: grafana/promtail:2.9.3
+    container_name: promtail
+    volumes:
+      - /var/log:/var/log
+      - /var/lib/docker/containers:/var/lib/docker/containers
+      - ./src/monitoring/promtail:/etc/promtail
+    command: -config.file=/etc/promtail/promtail-config.yml -config.expand-env=true
+    environment:
+      - LOKI_PORT=${LOKI_PORT}
+    restart: ${RESTART_POLICY}
+    networks:
+      - monitor-net
+    labels:
+      org.label-schema.group: "monitoring"
   alertmanager:
     image: prom/alertmanager:v0.28.0
     container_name: alertmanager
@@ -101,12 +136,14 @@ services:
       org.label-schema.group: "monitoring"
 
   grafana:
-    image: grafana/grafana:11.5.1
+    build:
+      context: ./src/monitoring/grafana
+      dockerfile: Dockerfile
+      args:
+        - LOKI_HTTP_PORT=${LOKI_HTTP_PORT}
     container_name: grafana
     volumes:
       - grafana_data:/var/lib/grafana
-      - ./src/monitoring/grafana/provisioning/dashboards:/etc/grafana/provisioning/dashboards
-      - ./src/monitoring/grafana/provisioning/datasources:/etc/grafana/provisioning/datasources
     environment:
       - GF_SECURITY_ADMIN_USER=${ADMIN_USER}
       - GF_SECURITY_ADMIN_PASSWORD=${ADMIN_PASSWORD}

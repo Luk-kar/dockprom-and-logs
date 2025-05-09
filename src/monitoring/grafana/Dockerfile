@@ -1,0 +1,37 @@
+# Stage 1: Template processor
+FROM alpine:3.19 AS processor
+
+ARG LOKI_HTTP_PORT
+ENV LOKI_HTTP_PORT=${LOKI_HTTP_PORT}
+
+RUN [ -z "$LOKI_HTTP_PORT" ] && (echo "ERROR: Build argument LOKI_HTTP_PORT must be set and non-empty"; exit 1) || true
+
+RUN apk add --no-cache gettext
+
+WORKDIR /build
+
+# Copy the provisioning template
+COPY loki.yaml.template .
+
+# Substitute the environment variable at build time
+RUN export LOKI_HTTP_PORT=$LOKI_HTTP_PORT && \
+    envsubst < loki.yaml.template > loki.yaml
+
+# Stage 2: Final Grafana image
+FROM grafana/grafana:11.5.1
+
+# Create provisioning directory if it doesn't exist
+COPY provisioning/ /etc/grafana/provisioning/
+
+# Copy the processed provisioning file
+COPY --from=processor /build/loki.yaml /etc/grafana/provisioning/datasources/loki.yaml
+
+# (Optional) Copy dashboards or other provisioning files as needed
+
+
+# (Optional) Set environment variables as defaults
+# ENV GF_SECURITY_ADMIN_USER=admin \
+#     GF_SECURITY_ADMIN_PASSWORD=admin
+
+# Expose Grafana's default port
+# EXPOSE 3000
