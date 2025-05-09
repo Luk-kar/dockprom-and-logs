@@ -25,13 +25,3 @@ COPY provisioning/ /etc/grafana/provisioning/
 
 # Copy the processed provisioning file
 COPY --from=processor /build/loki.yaml /etc/grafana/provisioning/datasources/loki.yaml
-
-# (Optional) Copy dashboards or other provisioning files as needed
-
-
-# (Optional) Set environment variables as defaults
-# ENV GF_SECURITY_ADMIN_USER=admin \
-#     GF_SECURITY_ADMIN_PASSWORD=admin
-
-# Expose Grafana's default port
-# EXPOSE 3000
