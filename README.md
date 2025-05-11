@@ -1,18 +1,45 @@
 # dockprom
 
 A monitoring solution for Docker hosts and containers with [Prometheus](https://prometheus.io/), [Grafana](http://grafana.org/), [cAdvisor](https://github.com/google/cadvisor),
-[NodeExporter](https://github.com/prometheus/node_exporter) and alerting with [AlertManager](https://github.com/prometheus/alertmanager).
+[NodeExporter](https://github.com/prometheus/node_exporter), [Loki](https://grafana.com/oss/loki/), [Promtail](https://grafana.com/docs/loki/latest/clients/promtail/), and alerting with [AlertManager](https://github.com/prometheus/alertmanager).
+
+
+This is a fork of the [stefanprodan/dockprom](https://github.com/stefanprodan/dockprom) project with a focus on adding Docker logs functionality through Loki and Promtail integration.
+
+## Key Changes From Original Project
+
+This fork enhances the original dockprom project with the following improvements:
+
+1. **Log Management**: Added Grafana Loki and Promtail for centralized log collection, storage, and visualization
+2. **Docker Logs Dashboard**: Created a dedicated Grafana dashboard for Docker container logs
+3. **Project Structure**: Reorganized into a more maintainable `src/monitoring/` directory structure
+4. **Environment Variables**: Added comprehensive `.env` configuration for easier customization
+5. **Improved Deployment**: Enhanced docker-compose configuration with build contexts and healthchecks
 
 ## Install
 
 Clone this repository on your Docker host, cd into dockprom directory and run compose up:
 
 ```bash
-git clone https://github.com/stefanprodan/dockprom
+git clone https://github.com/Luk-kar/dockprom
 cd dockprom
 
-ADMIN_USER='admin' ADMIN_PASSWORD='admin' ADMIN_PASSWORD_HASH='$2a$14$1l.IozJx7xQRVmlkEQ32OeEEfP5mRxTpbDTCTcXRqn19gXD8YK1pO' docker-compose up -d
+docker compose up -d
 ```
+
+## Architecture and Components
+
+Containers:
+
+* Prometheus (metrics database) `http://:9090`
+* Prometheus-Pushgateway (push acceptor for ephemeral and batch jobs) `http://:9091`
+* AlertManager (alerts management) `http://:9093`
+* Grafana (visualize metrics and logs) `http://:3000`
+* NodeExporter (host metrics collector)
+* cAdvisor (containers metrics collector)
+* Loki (log aggregation system)
+* Promtail (log collector)
+* Caddy (reverse proxy and basic auth provider for the components)
 
 **Caddy v2 does not accept plaintext passwords. It MUST be provided as a hash value. The above password hash corresponds to ADMIN_PASSWORD 'admin'. To know how to generate hash password, refer [Updating Caddy to v2](#Updating-Caddy-to-v2)**
 
@@ -36,72 +63,25 @@ Containers:
 * cAdvisor (containers metrics collector)
 * Caddy (reverse proxy and basic auth provider for prometheus and alertmanager)
 
-## Setup Grafana
+## Grafana Setup
 
-Navigate to `http://<host-ip>:3000` and login with user ***admin*** password ***admin***. You can change the credentials in the compose file or by supplying the `ADMIN_USER` and `ADMIN_PASSWORD` environment variables on compose up. The config file can be added directly in grafana part like this
+Navigate to `http://:3000` and login with user ***admin*** password ***admin***. You can change the credentials in the .env file or by supplying the `GRAFANA_ADMIN_USERNAME` and `GRAFANA_ADMIN_PASSWORD` environment variables on compose up.
 
-```yaml
-grafana:
-  image: grafana/grafana:7.2.0
-  env_file:
-    - config
-```
+## Dashboards
 
-and the config file format should have this content
 
-```yaml
-GF_SECURITY_ADMIN_USER=admin
-GF_SECURITY_ADMIN_PASSWORD=changeme
-GF_USERS_ALLOW_SIGN_UP=false
-```
+### Docker Logs Dashboard
 
-If you want to change the password, you have to remove this entry, otherwise the change will not take effect
+![Logs Dashboard](https://raw.githubusercontent.com/yourrepo/dockprom/master/screens/Grafana_ management capabilities):
 
-```yaml
-- grafana_data:/var/lib/grafana
-```
+* Log volume metrics showing error, warning, and total log counts
+* Real-time log viewer with filtering capabilities
+* Error and warning log highlighting
+* Container-specific log filtering
 
-Grafana is preconfigured with dashboards and Prometheus as the default data source:
+### Docker Containers Dashboard
 
-* Name: Prometheus
-* Type: Prometheus
-* Url: [http://prometheus:9090](http://prometheus:9090)
-* Access: proxy
-
-***Docker Host Dashboard***
-
-![Host](https://raw.githubusercontent.com/stefanprodan/dockprom/master/screens/Grafana_Docker_Host.png)
-
-The Docker Host Dashboard shows key metrics for monitoring the resource usage of your server:
-
-* Server uptime, CPU idle percent, number of CPU cores, available memory, swap and storage
-* System load average graph, running and blocked by IO processes graph, interrupts graph
-* CPU usage graph by mode (guest, idle, iowait, irq, nice, softirq, steal, system, user)
-* Memory usage graph by distribution (used, free, buffers, cached)
-* IO usage graph (read Bps, read Bps and IO time)
-* Network usage graph by device (inbound Bps, Outbound Bps)
-* Swap usage and activity graphs
-
-For storage and particularly Free Storage graph, you have to specify the fstype in grafana graph request.
-You can find it in `grafana/provisioning/dashboards/docker_host.json`, at line 480 :
-
-```yaml
-"expr": "sum(node_filesystem_free_bytes{fstype=\"btrfs\"})",
-```
-
-I work on BTRFS, so i need to change `aufs` to `btrfs`.
-
-You can find right value for your system in Prometheus `http://<host-ip>:9090` launching this request :
-
-```yaml
-node_filesystem_free_bytes
-```
-
-***Docker Containers Dashboard***
-
-![Containers](https://raw.githubusercontent.com/stefanprodan/dockprom/master/screens/Grafana_Docker_Containers.png)
-
-The Docker Containers Dashboard shows key metrics for monitoring running containers:
+![Containers Dashboard](https://raw.githubusercontent.com/stefanprodan/dockprom/master/screens/Grafana_Docker Containers Dashboard shows key metrics for monitoring running containers):
 
 * Total containers CPU load, memory and storage usage
 * Running containers graph, system load graph, IO usage graph
@@ -111,29 +91,21 @@ The Docker Containers Dashboard shows key metrics for monitoring running contain
 * Container network inbound usage graph
 * Container network outbound usage graph
 
-Note that this dashboard doesn't show the containers that are part of the monitoring stack.
+### Docker Host Dashboard
 
-For storage and particularly Storage Load graph, you have to specify the fstype in grafana graph request.
-You can find it in `grafana/provisioning/dashboards/docker_containers.json`, at line 406 :
+![Host Dashboard](https://raw.githubusercontent.com/stefanprodan/dockprom/master/screens monitoring the resource usage of your server):
 
-```yaml
-"expr": "(node_filesystem_size_bytes{fstype=\"btrfs\"} - node_filesystem_free_bytes{fstype=\"btrfs\"}) / node_filesystem_size_bytes{fstype=\"btrfs\"}  * 100"，
-```
+* Server uptime, CPU idle percent, number of CPU cores, available memory, swap and storage
+* System load average graph, running and blocked by IO processes graph, interrupts graph
+* CPU usage graph by mode (guest, idle, iowait, irq, nice, softirq, steal, system, user)
+* Memory usage graph by distribution (used, free, buffers, cached)
+* IO usage graph (read Bps, read Bps and IO time)
+* Network usage graph by device (inbound Bps, Outbound Bps)
+* Swap usage and activity graphs
 
-I work on BTRFS, so i need to change `aufs` to `btrfs`.
+### Monitor Services Dashboard
 
-You can find right value for your system in Prometheus `http://<host-ip>:9090` launching this request :
-
-```yaml
-node_filesystem_size_bytes
-node_filesystem_free_bytes
-```
-
-***Monitor Services Dashboard***
-
-![Monitor Services](https://raw.githubusercontent.com/stefanprodan/dockprom/master/screens/Grafana_Prometheus.png)
-
-The Monitor Services Dashboard shows key metrics for monitoring the containers that make up the monitoring stack:
+![Monitor Services](https://raw.githubusercontent.com/stefanprodan/dockprom/master/screens/Grafana_ Services Dashboard shows key metrics for monitoring the containers that make up the monitoring stack:
 
 * Prometheus container uptime, monitoring stack total memory usage, Prometheus local storage memory chunks and series
 * Container CPU usage graph
@@ -143,7 +115,7 @@ The Monitor Services Dashboard shows key metrics for monitoring the containers t
 * Prometheus samples ingested rate, target scrapes and scrape duration graphs
 * Prometheus HTTP requests graph
 * Prometheus alerts graph
-
+* 
 ## Define alerts
 
 Three alert groups have been setup within the [alert.rules](https://github.com/stefanprodan/dockprom/blob/master/prometheus/alert.rules) configuration file:
@@ -332,7 +304,7 @@ First perform a `docker-compose down` then modify your docker-compose.yml to inc
       org.label-schema.group: "monitoring"
 ```
 
-Perform a `docker-compose up -d` and then issue the following commands:
+Perform a `docker compose up -d` and then issue the following commands:
 
 ```bash
 docker exec -it --user root grafana bash
