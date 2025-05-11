@@ -13,7 +13,7 @@ services:
       dockerfile: Dockerfile
       args:
         - PROMETHEUS_MONITOR_LABEL=${PROMETHEUS_MONITOR_LABEL}
-        - NODEEXPORTER_PORT=${NODEEXPORTER_PORT}
+        - NODE_EXPORTER_PORT=${NODE_EXPORTER_PORT}
         - CADVISOR_PORT=${CADVISOR_PORT}
         - PROMETHEUS_PORT=${PROMETHEUS_PORT}
         - PUSHGATEWAY_PORT=${PUSHGATEWAY_PORT}
@@ -110,7 +110,7 @@ services:
       - "--collector.filesystem.mount-points-exclude=^/(sys|proc|dev|host|etc)($$|/)"
     restart: ${RESTART_POLICY}
     expose:
-      - ${NODEEXPORTER_PORT}
+      - ${NODE_EXPORTER_PORT}
     networks:
       - monitor-net
     labels:
