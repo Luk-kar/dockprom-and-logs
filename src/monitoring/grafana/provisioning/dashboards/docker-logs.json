@@ -255,7 +255,7 @@
   },
   "timepicker": {},
   "timezone": "",
-  "title": "Docker Logs Dashboard",
+  "title": "\u200BDocker Logs",
   "tags": ["loki", "promtail"],
   "uid": "docker-logs",
   "version": 3,
