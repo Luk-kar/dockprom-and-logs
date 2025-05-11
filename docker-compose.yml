@@ -52,7 +52,7 @@ services:
       - ./src/monitoring/loki:/etc/loki
     command: -config.file=/etc/loki/loki-config.yml -config.expand-env=true
     environment:
-      - LOKI_HTTP_PORT=${LOKI_PORT}
+      - LOKI_PORT=${LOKI_PORT}
       - LOKI_GRPC_PORT=${LOKI_GRPC_PORT}
       - LOKI_PATH_PREFIX=${LOKI_PATH_PREFIX}
       - LOKI_REPLICATION_FACTOR=${LOKI_REPLICATION_FACTOR}
@@ -140,7 +140,7 @@ services:
       context: ./src/monitoring/grafana
       dockerfile: Dockerfile
       args:
-        - LOKI_HTTP_PORT=${LOKI_HTTP_PORT}
+        - LOKI_PORT=${LOKI_PORT}
     container_name: grafana
     volumes:
       - grafana_data:/var/lib/grafana

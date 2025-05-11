@@ -1,7 +1,7 @@
 auth_enabled: false
 
 server:
-  http_listen_port: ${LOKI_HTTP_PORT}
+  http_listen_port: ${LOKI_PORT}
   grpc_listen_port: ${LOKI_GRPC_PORT}
 
 common:

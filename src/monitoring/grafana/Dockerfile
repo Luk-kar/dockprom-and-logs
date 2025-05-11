@@ -1,10 +1,10 @@
 # Stage 1: Template processor
 FROM alpine:3.19 AS processor
 
-ARG LOKI_HTTP_PORT
-ENV LOKI_HTTP_PORT=${LOKI_HTTP_PORT}
+ARG LOKI_PORT
+ENV LOKI_PORT=${LOKI_PORT}
 
-RUN [ -z "$LOKI_HTTP_PORT" ] && (echo "ERROR: Build argument LOKI_HTTP_PORT must be set and non-empty"; exit 1) || true
+RUN [ -z "$LOKI_PORT" ] && (echo "ERROR: Build argument LOKI_PORT must be set and non-empty"; exit 1) || true
 
 RUN apk add --no-cache gettext
 
@@ -14,7 +14,7 @@ WORKDIR /build
 COPY loki.yaml.template .
 
 # Substitute the environment variable at build time
-RUN export LOKI_HTTP_PORT=$LOKI_HTTP_PORT && \
+RUN export LOKI_PORT=$LOKI_PORT && \
     envsubst < loki.yaml.template > loki.yaml
 
 # Stage 2: Final Grafana image

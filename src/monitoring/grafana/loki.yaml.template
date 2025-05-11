@@ -3,7 +3,7 @@ datasources:
   - name: Loki
     type: loki
     access: proxy
-    url: http://loki:${LOKI_HTTP_PORT}
+    url: http://loki:${LOKI_PORT}
     jsonData:
       maxLines: 1000
     editable: false
