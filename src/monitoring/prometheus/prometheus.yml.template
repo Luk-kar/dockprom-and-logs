@@ -43,7 +43,7 @@ alerting:
 #  - job_name: 'nginx'
 #    scrape_interval: 10s
 #    static_configs:
-#      - targets: ['nginxexporter:${NGIX_EXPORTER_PORT}']
+#      - targets: ['nginxexporter:${NGINX_EXPORTER_PORT}']
 
 #  - job_name: 'aspnetcore'
 #    scrape_interval: 10s
