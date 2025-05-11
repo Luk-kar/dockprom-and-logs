@@ -16,16 +16,16 @@
     reverse_proxy prometheus:{$PROMETHEUS_PORT}
 }
 
-:{$HOST_ALERTMANAGER_PORT} {
+:{$HOST_LOKI_PORT} {
     basicauth /* {
         {$GRAFANA_ADMIN_USERNAME} {$CADDY_ADMIN_PASSWORD_HASH}
     }
-    reverse_proxy alertmanager:{$ALERTMANAGER_PORT}
+    reverse_proxy loki:{$LOKI_PORT}
 }
 
-:{$HOST_PUSHGATEWAY_PORT} {
+:{$HOST_PROMTAIL_PORT} {
     basicauth /* {
         {$GRAFANA_ADMIN_USERNAME} {$CADDY_ADMIN_PASSWORD_HASH}
     }
-    reverse_proxy pushgateway:{$PUSHGATEWAY_PORT}
+    reverse_proxy promtail:{$PROMTAIL_PORT}
 }
