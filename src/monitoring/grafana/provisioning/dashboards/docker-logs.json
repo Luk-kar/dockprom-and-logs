@@ -246,7 +246,6 @@
   "preload": false,
   "refresh": "",
   "schemaVersion": 40,
-  "tags": [],
   "templating": {
     "list": []
   },
@@ -257,6 +256,7 @@
   "timepicker": {},
   "timezone": "",
   "title": "Docker Logs Dashboard",
+  "tags": ["loki", "promtail"],
   "uid": "docker-logs",
   "version": 3,
   "weekStart": ""
