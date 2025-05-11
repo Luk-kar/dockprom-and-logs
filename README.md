@@ -1,4 +1,4 @@
-# dockprom
+# dockprom-and-logs
 
 A monitoring solution for Docker hosts and containers with [Prometheus](https://prometheus.io/), [Grafana](http://grafana.org/), [cAdvisor](https://github.com/google/cadvisor),
 [NodeExporter](https://github.com/prometheus/node_exporter), [Loki](https://grafana.com/oss/loki/), [Promtail](https://grafana.com/docs/loki/latest/clients/promtail/), and alerting with [AlertManager](https://github.com/prometheus/alertmanager).
@@ -21,8 +21,8 @@ This fork enhances the original dockprom project with the following improvements
 Clone this repository on your Docker host, cd into dockprom directory and run compose up:
 
 ```bash
-git clone https://github.com/Luk-kar/dockprom
-cd dockprom
+git clone https://github.com/Luk-kar/dockprom-and-logs
+cd dockprom-and-logs
 
 docker compose up -d
 ```
@@ -72,7 +72,7 @@ Navigate to `http://:3000` and login with user ***admin*** password ***admin***.
 
 ### Docker Logs Dashboard
 
-![Logs Dashboard](https://raw.githubusercontent.com/yourrepo/dockprom/master/screens/Grafana_ management capabilities):
+![Logs Dashboard](https://raw.githubusercontent.com/Luk-kar/dockprom-and-logs//master/screens/Grafana_ management capabilities):
 
 * Log volume metrics showing error, warning, and total log counts
 * Real-time log viewer with filtering capabilities
