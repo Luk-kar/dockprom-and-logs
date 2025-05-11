@@ -1,29 +1,29 @@
-:{$HOST_GRAFANA_PORT} {
+:{$PUBLIC_GRAFANA_PORT} {
     reverse_proxy grafana:{$GRAFANA_PORT}
 }
 
-:{$HOST_CADVISOR_PORT} {
+:{$PUBLIC_CADVISOR_PORT} {
     basicauth /* {
         {$GRAFANA_ADMIN_USERNAME} {$CADDY_ADMIN_PASSWORD_HASH}
     }
     reverse_proxy cadvisor:{$CADVISOR_PORT}
 }
 
-:{$HOST_PROMETHEUS_PORT} {
+:{$PUBLIC_PROMETHEUS_PORT} {
     basicauth /* {
         {$GRAFANA_ADMIN_USERNAME} {$CADDY_ADMIN_PASSWORD_HASH}
     }
     reverse_proxy prometheus:{$PROMETHEUS_PORT}
 }
 
-:{$HOST_LOKI_PORT} {
+:{$PUBLIC_LOKI_PORT} {
     basicauth /* {
         {$GRAFANA_ADMIN_USERNAME} {$CADDY_ADMIN_PASSWORD_HASH}
     }
     reverse_proxy loki:{$LOKI_PORT}
 }
 
-:{$HOST_PROMTAIL_PORT} {
+:{$PUBLIC_PROMTAIL_PORT} {
     basicauth /* {
         {$GRAFANA_ADMIN_USERNAME} {$CADDY_ADMIN_PASSWORD_HASH}
     }
