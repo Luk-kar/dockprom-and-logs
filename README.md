@@ -53,16 +53,6 @@ Prerequisites:
 Perform a `docker run --rm caddy caddy hash-password --plaintext 'ADMIN_PASSWORD'` in order to generate a hash for your new password.
 ENSURE that you replace `ADMIN_PASSWORD` with new plain text password and `ADMIN_PASSWORD_HASH` with the hashed password references in [docker-compose.yml](./docker-compose.yml) for the caddy container.
 
-Containers:
-
-* Prometheus (metrics database) `http://<host-ip>:9090`
-* Prometheus-Pushgateway (push acceptor for ephemeral and batch jobs) `http://<host-ip>:9091`
-* AlertManager (alerts management) `http://<host-ip>:9093`
-* Grafana (visualize metrics) `http://<host-ip>:3000`
-* NodeExporter (host metrics collector)
-* cAdvisor (containers metrics collector)
-* Caddy (reverse proxy and basic auth provider for prometheus and alertmanager)
-
 ## Grafana Setup
 
 Navigate to `http://:3000` and login with user ***admin*** password ***admin***. You can change the credentials in the .env file or by supplying the `GRAFANA_ADMIN_USERNAME` and `GRAFANA_ADMIN_PASSWORD` environment variables on compose up.
