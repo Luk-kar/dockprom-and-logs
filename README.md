@@ -62,7 +62,9 @@ Navigate to `http://:3000` and login with user ***admin*** password ***admin***.
 
 ### Docker Logs Dashboard
 
-![Logs Dashboard](https://raw.githubusercontent.com/Luk-kar/dockprom-and-logs//master/screens/Grafana_ management capabilities):
+![Logs Dashboard](./src/monitoring/screens/Grafana_Docker_Logs.png)
+
+Monitoring the resource usage of your server:
 
 * Log volume metrics showing error, warning, and total log counts
 * Real-time log viewer with filtering capabilities
@@ -71,7 +73,9 @@ Navigate to `http://:3000` and login with user ***admin*** password ***admin***.
 
 ### Docker Containers Dashboard
 
-![Containers Dashboard](https://raw.githubusercontent.com/stefanprodan/dockprom/master/screens/Grafana_Docker Containers Dashboard shows key metrics for monitoring running containers):
+![Containers Dashboard](./src/monitoring/screens//Grafana_Docker_Containers.png)
+
+Shows key metrics for monitoring running containers:
 
 * Total containers CPU load, memory and storage usage
 * Running containers graph, system load graph, IO usage graph
@@ -83,7 +87,9 @@ Navigate to `http://:3000` and login with user ***admin*** password ***admin***.
 
 ### Docker Host Dashboard
 
-![Host Dashboard](https://raw.githubusercontent.com/stefanprodan/dockprom/master/screens monitoring the resource usage of your server):
+![Host Dashboard](./src/monitoring/screens/Grafana_Docker_Host.png)
+
+Monitoring the resource usage of your server:
 
 * Server uptime, CPU idle percent, number of CPU cores, available memory, swap and storage
 * System load average graph, running and blocked by IO processes graph, interrupts graph
@@ -94,8 +100,9 @@ Navigate to `http://:3000` and login with user ***admin*** password ***admin***.
 * Swap usage and activity graphs
 
 ### Monitor Services Dashboard
+![Monitor Services](./src/monitoring/screens/Grafana_Prometheus.png)
 
-![Monitor Services](https://raw.githubusercontent.com/stefanprodan/dockprom/master/screens/Grafana_ Services Dashboard shows key metrics for monitoring the containers that make up the monitoring stack:
+Shows key metrics for monitoring the containers that make up the monitoring stack:
 
 * Prometheus container uptime, monitoring stack total memory usage, Prometheus local storage memory chunks and series
 * Container CPU usage graph
@@ -105,7 +112,7 @@ Navigate to `http://:3000` and login with user ***admin*** password ***admin***.
 * Prometheus samples ingested rate, target scrapes and scrape duration graphs
 * Prometheus HTTP requests graph
 * Prometheus alerts graph
-* 
+
 ## Define alerts
 
 Three alert groups have been setup within the [alert.rules](https://github.com/stefanprodan/dockprom/blob/master/prometheus/alert.rules) configuration file:
