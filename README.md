@@ -64,7 +64,7 @@ Navigate to `http://:3000` and login with user ***admin*** password ***admin***.
 
 ![Logs Dashboard](./src/monitoring/screens/Grafana_Docker_Logs.png)
 
-Monitoring the resource usage of your server:
+Docker Logs Dashboard provides centralized visibility into container log activity, enabling monitoring of log volumes, real-time log streams, and filtering by log level or container for efficient troubleshooting and analysis
 
 * Log volume metrics showing error, warning, and total log counts
 * Real-time log viewer with filtering capabilities
