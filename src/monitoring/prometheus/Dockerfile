@@ -64,7 +64,9 @@ COPY entrypoint.sh /entrypoint.sh
 COPY config/ ./
 
 # Set permissions
+USER root
 RUN chmod +x /entrypoint.sh
+USER nobody
 
 # Use JSON-safe CMD
 CMD ["/entrypoint.sh"]
